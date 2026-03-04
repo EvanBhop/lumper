@@ -262,7 +262,7 @@ public sealed class PakfileExplorerViewModel : ViewModelWithView<PakfileExplorer
         {
             foreach ((string? name, Stream stream) in streams)
             {
-                _pakfileLumpViewModel!.AddEntry(string.Join("/", [.. branchPath, name]), stream, updater);
+                _pakfileLumpViewModel.AddEntry(string.Join("/", [.. branchPath, name]), stream, updater);
                 stream.Dispose();
             }
         });
@@ -284,7 +284,7 @@ public sealed class PakfileExplorerViewModel : ViewModelWithView<PakfileExplorer
             foreach (string path in Directory.EnumerateFiles(folder.Path.LocalPath, "*.*", SearchOption.AllDirectories))
             {
                 FileStream stream = File.OpenRead(path);
-                _pakfileLumpViewModel!.AddEntry(
+                _pakfileLumpViewModel.AddEntry(
                     string.Join("/", [.. branchPath, Path.GetRelativePath(rootPath, path).Replace('\\', '/')]),
                     stream,
                     updater
@@ -304,6 +304,8 @@ public sealed class PakfileExplorerViewModel : ViewModelWithView<PakfileExplorer
         await ShowMessageBox(msBox);
 
         string name = msBox.InputValue;
+        if (string.IsNullOrWhiteSpace(name))
+            return;
 
         List<string> pathList = [.. branchPath, name];
         Tree!.Root.AddDirectory(pathList);
@@ -323,6 +325,9 @@ public sealed class PakfileExplorerViewModel : ViewModelWithView<PakfileExplorer
         await ShowMessageBox(msBox);
 
         string name = msBox.InputValue;
+        if (string.IsNullOrWhiteSpace(name))
+            return;
+
         if (name.EndsWith(".vtf", StringComparison.OrdinalIgnoreCase))
         {
             Logger.Error("Creating empty VTFs is not supported, please import one.");
